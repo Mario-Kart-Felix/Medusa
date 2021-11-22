@@ -1,0 +1,2 @@
+1623917429 r2 c4: Received from topic node-r1-c4: {"data":{"id":"6-13","ttl":10,"to":"node-r0-c3","agentData":{"visited":["node-r0-c0","node-r1-c0","node-r0-c1","node-r1-c4"],"events":{"1":{"distance":4,"direction":"node-r0-c1"}},"numHops":4}},"event":"agent"}
+1623917429 r2 c4: Overheard an agent - {"data":{"agentData":{"visited":["node-r0-c0","node-r1-c0","node-r0-c1","node-r1-c4"],"events":{"1":{"direction":"node-r0-c1","distance":4}},"numHops":4},"ttl":10,"to":"node-r0-c3","id":"6-13"},"event":"agent"}

